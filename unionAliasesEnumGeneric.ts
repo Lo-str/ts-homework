@@ -157,7 +157,7 @@ const wrapInArray = <T>(item: T): T[] => {
     return [item]
 }
 
-wrapInArray("dog")
+console.log(wrapInArray("dog"))
  
 // Exercise 2: 
 const firstItem = <T>(arr: T[]): T | undefined => {
