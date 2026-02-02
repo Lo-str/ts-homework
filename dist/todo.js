@@ -9,14 +9,10 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
+let userName = 'Albert';
 // Intro
 const intro = () => {
-    rl.question(`\nHeya! How should I call you: `, (name) => {
-        if (name.trim() === "") {
-            name = "Albert";
-            console.log(`Mysterious! Alright, I'll call you ${name}!`);
-        }
-        console.log(`
+    console.log(`
             ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
             ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
             ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -31,12 +27,17 @@ const intro = () => {
             ¤¤¤¤¤¤¤¤¤     ¤¤¤¤¤¤¤¤           ¤¤         ¤¤¤¤¤¤¤           ¤¤¤¤¤¤¤            ¤¤¤
             ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
             ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤`);
-        console.log(`Welcome ${name}! What can I help you with: `);
+    rl.question(`\nHeya! How should I call you: `, (name) => {
+        userName = name.trim() === "" ? "Albert" : name.trim();
+        if (name.trim() === "") {
+            console.log(`Mysterious! Alright, I'll call you ${userName}!`);
+        }
         showMenu();
     });
 };
 // Show menu
 const showMenu = () => {
+    console.log(`Welcome ${userName}! What can I help you with:`);
     console.log(`\n
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -74,6 +75,8 @@ const showMenu = () => {
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII`);
 };
+process.stdout.write(">");
+rl.question("", (cmd) => handleCmd(cmd));
 // Handle commands logic
 const handleCmd = (cmd) => {
     switch (cmd) {
@@ -91,6 +94,7 @@ const handleCmd = (cmd) => {
             break;
         case "5":
             exit();
+            break;
         default:
             console.log("Unknown Command");
             showMenu();
@@ -98,36 +102,32 @@ const handleCmd = (cmd) => {
 };
 // Add more todos
 const moreAction = (msg, action) => {
-    rl.question(`\n${msg}\n(type "y" to proceed or enter to exit): `, (choice) => {
-        const yes = "y";
-        if (choice.toLowerCase() !== yes.toLowerCase()) {
-            process.stdout.write(">");
-            rl.question("", (cmd) => {
-                handleCmd(cmd);
-            });
-        }
-        else {
+    rl.question(`\n${msg}\n (type 'y' to proceed or press enter to exit): `, (choice) => {
+        if (choice.trim().toLowerCase() === "y") {
             action();
+            return;
         }
+        process.stdout.write(">");
+        rl.question("", (cmd) => {
+            handleCmd(cmd);
+        });
     });
 };
 // Add todos command
 const addTodos = () => {
-    const whichTask = rl.question(`\nGreat! What task would you like to add: `, (task) => {
+    rl.question(`\nGreat! What task would you like to add: `, (task) => {
         if (task.trim() === "") {
             console.log("Oi! You didn't write any task!");
-            console.log(whichTask);
+            moreAction("Try adding a task again?", addTodos);
+            return;
         }
-        else {
-            const newTask = {
-                id: Date.now(),
-                task: task.trim()
-            };
-            todos.push(newTask);
-            console.log(`Task added to your Todo's list!`);
-            moreAction("Would you like to add another task? ", addTodos);
-            console.log(whichTask);
-        }
+        const newTask = {
+            id: Date.now(),
+            task: task.trim()
+        };
+        todos.push(newTask);
+        console.log(`Task added to your Todo's list!`);
+        moreAction('Would you like to add another task?', addTodos);
     });
 };
 // Read todos command
@@ -171,7 +171,7 @@ const deleteTodos = () => {
 const clearAll = () => { };
 // Exit App
 const exit = () => {
-    console.log(`Have a lovely day ${showMenu.name}. See you next time!`);
+    console.log(`Have a lovely day ${userName}. See you next time!`);
     rl.close();
 };
 // Show a count of how many todos you have
@@ -185,5 +185,4 @@ const exit = () => {
 // Add due dates
 // Color-code todos (chalk)
 intro();
-showMenu();
 //# sourceMappingURL=todo.js.map

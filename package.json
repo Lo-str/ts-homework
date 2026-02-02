@@ -2,24 +2,16 @@
   "name": "ts-homework",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
+  "scripts": {
+  "dev": "tsx src/todo.ts",
+  "build": "tsc",
+  "start": "node dist/todo.js",
+  "clean": "powershell -NoProfile -Command \"Remove-Item dist -Recurse -Force -ErrorAction SilentlyContinue\""
+  },
   "devDependencies": {
     "@types/node": "^25.2.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
-  },
-  {
-    "dev": "tsx src/todo.ts",
-    "build": "tsc",
-    "start": "node dist/todo.js",
-    "clean": "rmdir /s /q dist"
   }
 }
