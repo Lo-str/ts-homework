@@ -14,7 +14,7 @@ type Todo = {
   task: string
   tags?: string[]
   done?: Done
-    priority?: Priority
+  priority?: Priority
 }
 
 // Variables
@@ -37,11 +37,11 @@ const priorityEmoji = (priority?: Priority): string => {
 }
 
 const newCount = () => {
-  let count = 0
+  let pending = 0
   for (const todo of todos) {
-    if (!todo.done) count++
+    if (!todo.done) pending++
   }
-  count = count
+  count = pending
 }
 
 const handleInteraction = (
@@ -51,8 +51,8 @@ const handleInteraction = (
 ) => {
   const escape = "q"
   rl.question(`${question} (type "${escape}" + Enter to go back): `, (input: string) => {
-    const cleaned = input.trim().toLowerCase()
-    if (cleaned === escape) {
+    const userInput = input.trim().toLowerCase()
+    if (userInput === escape) {
       onBack()
       return
     }
@@ -62,7 +62,8 @@ const handleInteraction = (
 
 // Intro
 const intro = () => {
-    console.log(`
+  console.clear()
+  console.log(`
                ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
                ¤¤             ¤¤        ¤¤       ¤¤¤¤¤¤¤        ¤¤   ¤¤           ¤
                ¤¤¤¤¤¤¤   ¤¤¤¤¤¤¤   ¤¤   ¤¤   ¤¤¤¤   ¤¤¤¤   ¤¤   ¤¤   ¤¤   ¤¤¤¤¤¤¤¤¤
@@ -71,19 +72,18 @@ const intro = () => {
                ¤¤¤¤¤¤¤   ¤¤¤¤¤¤¤   ¤¤   ¤¤   ¤¤¤¤¤    ¤¤   ¤¤   ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤   ¤
                ¤¤¤¤¤¤¤   ¤¤¤¤¤¤¤        ¤¤        ¤¤¤¤¤¤        ¤¤¤¤¤¤¤           ¤
                ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤`)
-    console.clear()
-    rl.question(`\nHeya! How should I call you: `, (name: string) => {
-    name.trim() === "" ?
-     console.log(`Mysterious! Alright, I'll call you ${userName}!`) :
-     userName = name.trim()
-     console.log(`Welcome ${userName}!`)
-     showMenu()
-    })
-    }
+  
+  rl.question(`\nHeya! How should I call you: `, (name: string) => {
+    if (name.trim() !== "") userName = name.trim()
+    newCount()
+    showMenu()
+  })
+}
 
 // Show menu
 const showMenu = () => {
   console.clear()
+  newCount()
   console.log(`Welcome ${userName}!\n`)
   console.log(`
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -96,17 +96,14 @@ const showMenu = () => {
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
                             IIIIII  Choose an action:                        IIIIII
-                            IIIIII                                           IIIIII
                             IIIIII  1. Add                                   IIIIII
                             IIIIII  2. Read                                  IIIIII
-                            IIIIII  3. Update                                IIIIII
-                            IIIIII  4. Delete                                IIIIII
-                            IIIIII  5. Clear All                             IIIIII
-                            IIIIII  6. Mark as Done                          IIIIII
-                            IIIIII  7. Exit                                  IIIIII
+                            IIIIII  3. Delete                                IIIIII
+                            IIIIII  4. Clear All                             IIIIII
+                            IIIIII  5. Mark as Done                          IIIIII
+                            IIIIII  6. Exit                                  IIIIII
                             IIIIII                                           IIIIII
                                     Tasks left: ${count}
-                            IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
                             IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
   `)
 
@@ -114,30 +111,27 @@ const showMenu = () => {
   rl.question("", (cmd: string) => handleCmd(cmd.trim()))
 }
 
-// Handle commands logic
+// Handle commands
 const handleCmd = (cmd: string): void => {
   switch (cmd) {
-    case "1":
-      addTodos()
-      break
-    case "2":
-      readTodos()
-      break
-    case "3":
-      editTodos()
-      break
-    case "4":
-      deleteTodos()
-      break
-    case "5":
-      clearAll()
-      break
-    case "6":
-      markAsDone()
-      break
-    case "7":
-      exit()
-      break
+    case "1": 
+      addTodos() 
+    break
+    case "2": 
+      readTodos() 
+    break
+    case "3": 
+      deleteTodos() 
+    break
+    case "4": 
+      clearAll() 
+    break
+    case "5": 
+      markAsDone() 
+    break
+    case "6": 
+      exit() 
+    break
     default:
       console.log("Unknown Command")
       pauseToMenu()
@@ -149,27 +143,22 @@ const pauseToMenu = () => {
 }
 
 const moreAction = (msg: string, action: () => void) => {
-    console.clear()
+  console.clear()
   rl.question(`\n${msg}\n(type "y" to proceed or press Enter to exit): `, (choice: string) => {
-    if (choice.trim().toLowerCase() === "y") {
-      action()
-    } else {
-      showMenu()
-    }
+    if (choice.trim().toLowerCase() === "y") action()
+    else showMenu()
   })
 }
 
 // Add todos
-const addTodos = () => {
-  askTask()
-}
+const addTodos = () => askTask()
 
 const askTask = () => {
   handleInteraction(
     `\nGreat! What task would you like to add: `,
     (input: string) => {
       const task = input.trim()
-      if (task === "") {
+      if (!task) {
         console.log("Oi! You didn't write any task!")
         moreAction("Try adding a task again?", askTask)
         return
@@ -180,172 +169,71 @@ const askTask = () => {
   )
 }
 
-// Add priority level
 const askPriority = (task: string) => {
-    console.clear()
+  console.clear()
   handleInteraction(
     `How important is this task (high / medium / low, or press Enter to cancel): `,
     (level: string) => {
       const p = level.trim().toLowerCase()
-
-      if (p === "") {
-        showMenu()
-        return
-      }
-
+      if (!p) return showMenu()
       if (p !== "high" && p !== "medium" && p !== "low") {
-        console.log("Wrong entry. Type: high, medium, or low.")
-        askPriority(task)
-        return
+        console.log("Wrong entry.")
+        return askPriority(task)
       }
-
       createTodo(task, p as Priority)
     },
     askTask
   )
 }
 
-// Prompt to add tags
-const askId = (next: () => ) => {
-    console.clear()
-    handleInteraction(
-        `Type the id of the task you would you like to edit:  `,
-        (input: string) => {
-            const id = parseInt(input, 10)
-            if (Number.isNaN(id)) {
-                console.log("Please enter a valid number.")
-                askId(id)
-                return
-            }
-            const foundIndex = todos.findIndex(t => t.id === id)
-            if (foundIndex === -1) {
-                console.log("Couldn't find the task.")
-                pauseToMenu()
-                return
-            } else {
-                console.log("Task found")
-                askTags()
-            }
-        },
-        showMenu
-    )
-}
-
-// Add tags
-const askTags = (tag: string) => {
-    console.clear()
-    askId()
-    handleInteraction(`
-        Choose a tag:
-        (f)un | (w)ork | (s)tudy | (p)erso`, (input: string) => {
-        const userInput = input.trim().toLowerCase()
-        if (userInput === "") {
-            showMenu()
-            return
-        } else if (
-            !userInput.includes("f") ||
-            !userInput.includes("w") ||
-            !userInput.includes("s") ||
-            !userInput.includes("p")) {
-            console.log("Wrong entry.")
-            askTags
-        } else {
-
-        }
-
-
-    },
-        showMenu
-    )
-}
-
-const addTags = (input: string) => {
-    const fun = "f"
-    const work = "w"
-    const study = "s"
-    const perso = "p"
-
-}
-
 const createTodo = (task: string, priority: Priority) => {
-  const newTask: Todo = {
-    id: nextId++,
-    task,
-    priority,
-  }
-
-  todos.push(newTask)
+  todos.push({ id: nextId++, task, priority })
   newCount()
-  console.log(`Task added to your Todo's list!`)
+  console.log(`Task added!`)
   moreAction("Would you like to add another task?", addTodos)
 }
 
-// Read todos command
-const readTodos = (): void => {
+// Read todos
+const readTodos = () => {
   console.clear()
-
-  if (todos.length === 0) {
+  if (!todos.length) {
     console.log("No task on the horizon yet!")
-    moreAction("Would you like to add a task?", addTodos)
-    return
+    return moreAction("Would you like to add a task?", addTodos)
   }
 
-  console.log("Here's your Todo's list:\n")
-  todos.forEach((t: Todo) => {
-    const doneMark = t.done ? t.done : "  "
-    const prioMark = priorityEmoji(t.priority) || "  "
-    console.log(`${t.id}. ${doneMark} {t.task} ${prioMark}$ `)
+  console.log("Here's your Todo list:\n")
+  todos.forEach(t => {
+    console.log(`${t.id}. ${t.done ?? " "} ${t.task} ${priorityEmoji(t.priority)}`)
   })
-
   pauseToMenu()
 }
 
-// Delete todos command
+// Delete
 const deleteTodos = () => {
   handleInteraction(
-    `Type the id of the task you would you like to delete: `,
+    `Type the id of the task you would like to delete: `,
     (input: string) => {
-      const id = parseInt(input, 10)
-      if (Number.isNaN(id)) {
-        console.log("Please enter a valid number.")
-        deleteTodos()
-        return
-      }
-
+      const id = parseInt(input)
       const before = todos.length
-      todos = todos.filter((t: Todo) => t.id !== id)
-
-      if (todos.length === before) {
-        console.log("Couldn't find the task.")
-      } else {
-        newCount()
-        console.log("List updated!")
-      }
-
+      todos = todos.filter(t => t.id !== id)
+      if (todos.length === before) console.log("Couldn't find the task.")
+      else newCount()
       pauseToMenu()
     },
     showMenu
   )
 }
 
-// Edit tasks
-const editTodos = () => {
-  console.clear()
-  console.log("Update is not implemented yet.")
-  pauseToMenu()
-}
-
 // Clear all
 const clearAll = () => {
   handleInteraction(
-    `Would you like to clear your list completely (enter "y" to validate or press Enter to exit)? `,
-    (reset: string) => {
-      const choice = reset.trim().toLowerCase()
-      if (choice === "y") {
-        todos.length = 0
+    `Would you like to clear your list completely (enter "y" to validate)? `,
+    reset => {
+      if (reset.trim().toLowerCase() === "y") {
+        todos = []
         nextId = 1
         newCount()
-        console.log("Your Todo list is now entirely cleared!")
+        console.log("Todo list cleared!")
       }
       pauseToMenu()
     },
@@ -357,53 +245,26 @@ const clearAll = () => {
 const markAsDone = () => {
   handleInteraction(
     `Type the id of the task you would like to mark as done: `,
-    (input: string) => {
-      const id = parseInt(input, 10)
-      if (Number.isNaN(id)) {
-        console.log("Please enter a valid number.")
-        markAsDone()
-        return
-      }
-
-      const foundIndex = todos.findIndex((t) => t.id === id)
-      if (foundIndex === -1) {
-        console.log("Couldn't find the task.")
-        pauseToMenu()
-        return
-      }
-
-      if (!todos[foundIndex].done) {
-        todos[foundIndex].done = "🟢"
+    input => {
+      const id = parseInt(input)
+      const t = todos.find(t => t.id === id)
+      if (!t) console.log("Couldn't find the task.")
+      else if (!t.done) {
+        t.done = "🟢"
         newCount()
-        console.log(`Marked as done: ${todos[foundIndex].task}`)
-      } else {
-        console.log("That task is already marked as done.")
+        console.log(`Marked as done: ${t.task}`)
       }
-
       pauseToMenu()
     },
     showMenu
   )
 }
 
-// Exit App
+// Exit
 const exit = () => {
   console.clear()
   console.log(`Have a lovely day ${userName}. See you next time!`)
   rl.close()
 }
-
-// Add categories or tags (work, school, personal)
-
-// Add a search command to finds todos by keyword
-
-// Save todos to a file so they don't disappear when you exit
-
-// CREATIVE
-// Add emojis
-
-// Add due dates
-
-// Color-code todos (chalk)
 
 intro()
