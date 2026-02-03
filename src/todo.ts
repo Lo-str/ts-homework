@@ -12,9 +12,12 @@ type Done = "🟢"
 type Todo = {
   id: number
   task: string
-  tags?: string[]
+  tags?: Tag
   done?: Done
-  priority?: Priority
+    priority?: Priority
+}
+type Tag = {
+    tag: "#" & "Fun" | "Work" | "Study" | "Perso"
 }
 
 // Variables
@@ -180,6 +183,7 @@ const askTask = () => {
   )
 }
 
+// Add priority level
 const askPriority = (task: string) => {
     console.clear()
   handleInteraction(
@@ -202,6 +206,17 @@ const askPriority = (task: string) => {
     },
     askTask
   )
+}
+
+// Add tags
+const asktags = (task: string) => {
+    console.clear()
+    handleInteraction(
+        `Would you like to add tag(s) to this task? `,
+        (input: string) => {
+            const tag = input.trim().toLowerCase()
+        }
+    )
 }
 
 const createTodo = (task: string, priority: Priority) => {
