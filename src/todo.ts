@@ -7,11 +7,13 @@ import * as readline from "readline"
 
 // Types
 type Priority = "high" | "medium" | "low"
+type Status = false
 type Todo = {
     id: number,
     task: string,
     priority?: Priority,
     tags?: [],
+    status?: Status
 }
 
 // Variables
@@ -236,7 +238,19 @@ const exit = () => {
 
 // MEDIUM
 // Add a "done" status - mark todos as complete
+const markAsDone = () => {
+    rl.question(`Type the id of the task you would like to mark as done`, (input: string) => {
+        const id: number = parseInt(input)
+        const done = todos.filter((todo: Todo) => todo.id === id)
+        if (done.length !== todos.length) {
+            console.log("Couldn't find the task.")
+        }
+        
+        const status: Todo = {
 
+        } 
+    })
+}
 // Add categories or tags (work, school, personal)
 
 // Add a search command to finds todos by keyword
