@@ -12,12 +12,9 @@ type Done = "🟢"
 type Todo = {
   id: number
   task: string
-  tags?: Tag
+  tags?: string[]
   done?: Done
     priority?: Priority
-}
-type Tag = {
-    tag: "#" & "Fun" | "Work" | "Study" | "Perso"
 }
 
 // Variables
@@ -39,7 +36,7 @@ const priorityEmoji = (priority?: Priority): string => {
   return ""
 }
 
-const recalcCount = () => {
+const newCount = () => {
   let count = 0
   for (const todo of todos) {
     if (!todo.done) count++
@@ -208,15 +205,66 @@ const askPriority = (task: string) => {
   )
 }
 
-// Add tags
-const asktags = (task: string) => {
+// Prompt to add tags
+const askId = (next: () => ) => {
     console.clear()
     handleInteraction(
-        `Would you like to add tag(s) to this task? `,
+        `Type the id of the task you would you like to edit:  `,
         (input: string) => {
-            const tag = input.trim().toLowerCase()
-        }
+            const id = parseInt(input, 10)
+            if (Number.isNaN(id)) {
+                console.log("Please enter a valid number.")
+                askId(id)
+                return
+            }
+            const foundIndex = todos.findIndex(t => t.id === id)
+            if (foundIndex === -1) {
+                console.log("Couldn't find the task.")
+                pauseToMenu()
+                return
+            } else {
+                console.log("Task found")
+                askTags()
+            }
+        },
+        showMenu
     )
+}
+
+// Add tags
+const askTags = (tag: string) => {
+    console.clear()
+    askId()
+    handleInteraction(`
+        Choose a tag:
+        (f)un | (w)ork | (s)tudy | (p)erso`, (input: string) => {
+        const userInput = input.trim().toLowerCase()
+        if (userInput === "") {
+            showMenu()
+            return
+        } else if (
+            !userInput.includes("f") ||
+            !userInput.includes("w") ||
+            !userInput.includes("s") ||
+            !userInput.includes("p")) {
+            console.log("Wrong entry.")
+            askTags
+        } else {
+
+        }
+
+
+    },
+        showMenu
+    )
+}
+
+const addTags = (input: string) => {
+    const fun = "f"
+    const work = "w"
+    const study = "s"
+    const perso = "p"
+
 }
 
 const createTodo = (task: string, priority: Priority) => {
@@ -227,7 +275,7 @@ const createTodo = (task: string, priority: Priority) => {
   }
 
   todos.push(newTask)
-  recalcCount()
+  newCount()
   console.log(`Task added to your Todo's list!`)
   moreAction("Would you like to add another task?", addTodos)
 }
@@ -265,12 +313,12 @@ const deleteTodos = () => {
       }
 
       const before = todos.length
-      todos = todos.filter((todo: Todo) => todo.id !== id)
+      todos = todos.filter((t: Todo) => t.id !== id)
 
       if (todos.length === before) {
         console.log("Couldn't find the task.")
       } else {
-        recalcCount()
+        newCount()
         console.log("List updated!")
       }
 
@@ -296,7 +344,7 @@ const clearAll = () => {
       if (choice === "y") {
         todos.length = 0
         nextId = 1
-        recalcCount()
+        newCount()
         console.log("Your Todo list is now entirely cleared!")
       }
       pauseToMenu()
@@ -326,7 +374,7 @@ const markAsDone = () => {
 
       if (!todos[foundIndex].done) {
         todos[foundIndex].done = "🟢"
-        recalcCount()
+        newCount()
         console.log(`Marked as done: ${todos[foundIndex].task}`)
       } else {
         console.log("That task is already marked as done.")
